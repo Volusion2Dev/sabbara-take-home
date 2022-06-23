@@ -3,7 +3,7 @@ import Head from "next/head";
 import styled from "styled-components";
 import { Toaster } from "@blueprintjs/core";
 
-import * as api from './api';
+import * as api from "./api";
 
 import UnstyledBlockPicker from "../components/block-picker";
 import UnstyledSite from "../components/site";
@@ -30,7 +30,7 @@ const defaultBlocks: Block[] = [
     type: "header",
     position: 0,
     configData: {
-      title: 'Default Title'
+      title: "Default Title",
     },
   },
   {
@@ -38,19 +38,20 @@ const defaultBlocks: Block[] = [
     type: "hero",
     position: 1,
     configData: {
-      title: 'Default Title',
-      subtitle: 'Default Subtitle',
-    }
+      title: "Default Title",
+      subtitle: "Default Subtitle",
+    },
   },
   {
     id: 3,
     type: "footer",
     position: 2,
-    configData: null
-  }
+    configData: null,
+  },
 ];
 
 export default function Home(): JSX.Element {
+  const [sidebarDisabled, setSidebarDisabled] = useState(false);
   const [blockList, setBlockList] = useState(defaultBlocks);
   const [activeIndex, setActiveIndex] = useState(-1);
   const toasterRef = useRef(null);
@@ -71,7 +72,7 @@ export default function Home(): JSX.Element {
   }, []);
 
   // TODO: call api to save block
-  const addBlock = (blockName: BlockType) => {
+  const addBlock = async (blockName: BlockType) => {
     if (activeIndex === -1) {
       toasterRef.current.show({
         message:
@@ -80,14 +81,28 @@ export default function Home(): JSX.Element {
       });
       return;
     }
-    const updatedBlockList = [
-      ...blockList.slice(0, activeIndex),
-      { id: -1, type: blockName, position: activeIndex + 1, configData: null  },
-      ...blockList.slice(activeIndex),
-    ];
+    try {
+      await api.addBlock({
+        type: blockName,
+        position: activeIndex + 1,
+        configData: null,
+      });
+      const updatedBlockList = [
+        ...blockList.slice(0, activeIndex),
+        {
+          id: -1,
+          type: blockName,
+          position: activeIndex + 1,
+          configData: null,
+        },
+        ...blockList.slice(activeIndex),
+      ];
 
-    setBlockList(updatedBlockList);
-    setActiveIndex(activeIndex + 1);
+      setBlockList(updatedBlockList);
+      setActiveIndex(activeIndex + 1);
+    } catch (e) {
+      console.info("err", e);
+    }
   };
 
   const removeBlock = (index: number) => {
@@ -111,12 +126,18 @@ export default function Home(): JSX.Element {
 
       <AppContainer>
         <Toaster ref={toasterRef} />
-        <BlockPicker addBlock={addBlock} />
+        {!sidebarDisabled && (
+          <BlockPicker
+            addBlock={addBlock}
+            setSidebarDisabled={() => setSidebarDisabled(true)}
+          />
+        )}
         <Site
           activeIndex={activeIndex}
           blockList={blockList}
           removeBlock={removeBlock}
           setActiveIndex={setActiveIndex}
+          sidebarDisabled={sidebarDisabled}
         />
       </AppContainer>
     </div>

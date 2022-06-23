@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Icon } from "@blueprintjs/core";
 
 import blocks from "../components/blocks";
-import { Block } from '../types';
+import { Block } from "../types";
 
 const Container = styled.div`
   overflow-x: scroll;
@@ -13,7 +13,7 @@ const Container = styled.div`
 
 const BlockContainer = styled.div`
   margin: 0;
-  transition: margin 0.2s ease;
+  transition: margin 1s ease;
 
   button {
     opacity: 0;
@@ -62,8 +62,11 @@ const AddButton = styled.button.attrs({
   left: calc(50% - 15px);
   position: absolute;
   transform: translateY(-15px);
-  transition: opacity 0.2s ease;
+  transition: 0.2s all ease;
   width: 30px;
+  &:hover{
+    background:#d64545;
+  }
 `;
 
 const TrashButton = styled.button`
@@ -83,6 +86,7 @@ interface SiteProps {
   activeIndex: number;
   blockList: Block[];
   className?: string;
+  sidebarDisabled: boolean;
   removeBlock: (index: number) => void;
   setActiveIndex: (index: number) => void;
 }
@@ -91,6 +95,7 @@ const site: React.FunctionComponent<SiteProps> = ({
   activeIndex,
   blockList,
   className,
+  sidebarDisabled,
   removeBlock,
   setActiveIndex,
 }) => {
@@ -100,23 +105,38 @@ const site: React.FunctionComponent<SiteProps> = ({
         const Component = blocks[block.type];
         return (
           <BlockContainer data-testid="block-container" key={index}>
-            {index === activeIndex ? (
-              <Spacer data-testid="spacer">
-                <div>(Insert Blocks from the Side Panel Here)</div>
-                <CloseSpacer onClick={() => setActiveIndex(-1)}>x</CloseSpacer>
-              </Spacer>
-            ) : (
-              <AddButton onClick={() => setActiveIndex(index)}> + </AddButton>
+            {!sidebarDisabled && (
+              <>
+                {index === activeIndex ? (
+                  <Spacer data-testid="spacer">
+                    <div>(Insert Blocks from the Side Panel Here)</div>
+                    <CloseSpacer onClick={() => setActiveIndex(-1)}>
+                      x
+                    </CloseSpacer>
+                  </Spacer>
+                ) : (
+                  <AddButton onClick={() => setActiveIndex(index)}>+</AddButton>
+                )}
+                <TrashButton
+                  data-testid="remove-button"
+                  onClick={() => {
+                    if(window.confirm("Are you sure you want to delete this block?") === true) {
+                    removeBlock(index)}
+                  }}
+                >
+                  <Icon icon="trash" intent="danger" iconSize={15} />
+                </TrashButton>
+              </>
             )}
-            <TrashButton
-              data-testid="remove-button"
-              onClick={() => removeBlock(index)}
-            >
-              <Icon icon="trash" intent="danger" iconSize={15} />
-            </TrashButton>
-            <Component data={block.configData} />
-            {index + 1 !== activeIndex && (
-              <AddButton onClick={() => setActiveIndex(index + 1)}>+</AddButton>
+            <Component data={block.configData} sidebarDisabled={sidebarDisabled}/>
+            {!sidebarDisabled && (
+              <>
+                {index + 1 !== activeIndex && (
+                  <AddButton onClick={() => setActiveIndex(index + 1)}>
+                    +
+                  </AddButton>
+                )}
+              </>
             )}
           </BlockContainer>
         );

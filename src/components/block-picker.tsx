@@ -15,6 +15,10 @@ const Container = styled.div`
 `;
 
 const HeaderSection = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   background: #243b53;
   margin-bottom: 10px;
   padding: 20px 20px;
@@ -44,16 +48,29 @@ const StyledButton = styled(Button)`
   width: 80%;
 `;
 
+const StyledHeaderButton = styled(Button)`
+  background-color: #9fb3c8 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: #102a43 !important;
+  font-weight: bold;
+  padding: 10px;
+  text-transform: capitalize;
+  width: 30%;
+`;
+
 interface BlockPickerProps {
   addBlock: (blockName: string) => void;
   className?: string;
+  setSidebarDisabled: () => void;
 }
 
-const BlockPicker: React.FunctionComponent<BlockPickerProps> = ({ addBlock, className }) => {
+const BlockPicker: React.FunctionComponent<BlockPickerProps> = ({ addBlock, className, setSidebarDisabled }) => {
   return (
     <Container className={className}>
       <HeaderSection>
         <HeaderText> Add a Block </HeaderText>
+        <StyledHeaderButton onClick={setSidebarDisabled}>Disable Sidebar</StyledHeaderButton>
       </HeaderSection>
       <BlockSection>
         {Object.keys(blocks).map((blockName: string, index: number) => (

@@ -1,13 +1,13 @@
-import pgPromise from 'pg-promise';
+import pgPromise from "pg-promise";
 
-import { Block } from '../types';
+import { Block } from "../types";
 
 const connOptions = {
-  host: 'localhost',
+  host: "localhost",
   port: 5432,
-  database: 'postgres',
-  user: 'postgres',
-  password: 'postgres'
+  database: "postgres",
+  user: "postgres",
+  password: "postgres",
 };
 const pgp = pgPromise();
 const db = pgp(connOptions);
@@ -25,6 +25,18 @@ export async function getBlocks(): Promise<Block[]> {
     id: row.id,
     type: row.block_type,
     position: row.position,
-    configData: JSON.parse(row.data)
+    configData: JSON.parse(row.data),
   }));
+}
+
+export async function addBlock(block: Block): Promise<any> {
+  const result = await db.none(
+    "INSERT INTO site_builder.block(block_type, configured_data, position) VALUES($/block_type/, $/configured_data/, $/position/)",
+    {
+      block_type: block.type,
+      configured_data: `${block.configData}`,
+      position: block.position,
+    }
+  );
+  return result;
 }

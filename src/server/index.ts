@@ -2,7 +2,7 @@ import * as bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 import next from 'next';
 
-import { getBlocks }  from './api/blocks';
+import { getBlocks, addBlock }  from './api/blocks';
 import { ApiResponse } from "./apiResponse";
 
 const port = parseInt(process.env.PORT || '3000');
@@ -16,6 +16,11 @@ app.prepare().then(() => {
 
   server.get('/blocks', async (_req: Request, res: Response) => {
     const blockResponse: ApiResponse = await getBlocks();
+    res.status(blockResponse.statusCode).json(blockResponse.data);
+  });
+
+  server.post('/blocks', async (_req: Request, res: Response) => {
+    const blockResponse: ApiResponse = await addBlock(_req.body);
     res.status(blockResponse.statusCode).json(blockResponse.data);
   });
 
