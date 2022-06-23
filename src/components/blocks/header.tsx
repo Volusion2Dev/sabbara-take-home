@@ -21,9 +21,10 @@ const Name = styled.input`
 
 interface HeaderProps {
   data?: { title: string};
+  sidebarDisabled: boolean;
 }
 
-const Header: React.FunctionComponent<HeaderProps> = ({ data }): JSX.Element => {
+const Header: React.FunctionComponent<HeaderProps> = ({ data, sidebarDisabled }): JSX.Element => {
   const [title, setTitle] = useState(data?.title || 'store name');
   useEffect(() => {
     document.title = title;
@@ -35,6 +36,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({ data }): JSX.Element => 
   return (
     <Container data-testid="header">
       <Name
+        disabled={sidebarDisabled}
         placeholder="Store Name" defaultValue={title}
         onChange={(e) => setTitle(e.currentTarget.value)}/>
       <Icon icon="shopping-cart" intent="success" iconSize={28} />

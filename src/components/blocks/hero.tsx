@@ -52,18 +52,49 @@ const StyledButton = styled(Button)`
   box-shadow: none !important;
   color: #f0f4f8 !important;
   font-weight: bold;
-  margin: 0 auto;
+  margin: 15px auto 0;
   width: 30%;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  span{
+    color: #f0f4f8;
+    position: relative;
+    z-index: 5;
+    transition: color 750ms ease;
+  }
+  &:hover {
+    &:before{
+      transform: translateX(0);
+      transition: transform 750ms ease;
+    }
+  }
+  &::before{
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #a92c2c;
+    z-index: -1;
+    transform: translateX(-100%);
+    z-index: 1;
+    transition: transform 750ms ease;
+    margin-right: 0px;
+  }
 `;
 
 interface HeroProps {
   data: {
     title?: string;
     subtitle?: string;
-  }
+  },
+  sidebarDisabled: boolean;
 }
 
-const Hero: React.FunctionComponent<HeroProps> = ({ data }): JSX.Element => {
+const Hero: React.FunctionComponent<HeroProps> = ({ data, sidebarDisabled }): JSX.Element => {
   const [title, setTitle] = useState(data?.title || "Title");
   const [subtitle, setSubtitle] = useState(data?.subtitle || "Subtitle");
 
@@ -76,10 +107,12 @@ const Hero: React.FunctionComponent<HeroProps> = ({ data }): JSX.Element => {
     <Container data-testid="hero">
       <Overlay>
         <Title
+          disabled={sidebarDisabled}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
         <SubTitle
+          disabled={sidebarDisabled}
           value={subtitle}
           onChange={(e) => setSubtitle(e.currentTarget.value)}
         />
